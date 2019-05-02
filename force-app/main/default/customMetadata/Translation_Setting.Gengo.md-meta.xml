@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Gengo</label>
+    <protected>false</protected>
+    <values>
+        <field>Api_Key__c</field>
+        <value xsi:type="xsd:string">dgW3lH-B@^^^6s1W9SbF$I[sDIbxd0{)NSvPEvN)w]7ZbgBIflSTxhr(wSHmq_lT</value>
+    </values>
+    <values>
+        <field>Api_Sig__c</field>
+        <value xsi:type="xsd:string">)B1h_U6kv7[|NAf~VpPyR)8neDEbE4iOJW=3A(D$fLP^jn^H|=pVl{bxkzM62|Qi</value>
+    </values>
+    <values>
+        <field>Production_Url__c</field>
+        <value xsi:type="xsd:string">https://api.gengo.com/v2/</value>
+    </values>
+    <values>
+        <field>Sandbox_Url__c</field>
+        <value xsi:type="xsd:string">http://api.sandbox.gengo.com/v2/</value>
+    </values>
+    <values>
+        <field>Version__c</field>
+        <value xsi:type="xsd:string">2</value>
+    </values>
+</CustomMetadata>
