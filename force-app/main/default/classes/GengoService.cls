@@ -23,22 +23,24 @@ public class GengoService implements TranslationService {
             ];
 
             if (!settings.isEmpty()) {
-                Translation_Setting__mdt setting = settings.get(0);
-
-                String currentTime = String.valueOf(Datetime.now().getTime());
-
-                this.apiKey = setting.Api_Key__c;
-                this.ts = currentTime;
-
-                Blob hmacData = Crypto.generateMac(
-                    'hmacSHA1', 
-                    Blob.valueOf(currentTime), 
-                    Blob.valueOf(setting.Api_Sig__c)
-                );
-
-                this.apiSig = EncodingUtil.convertToHex(hmacData);
-                this.apiUrl = (setting.Use_Sandbox__c) ? setting.Sandbox_Url__c: setting.Production_Url__c;
+                initialize(settings.get(0));
             }
+        }
+
+        private void initialize(Translation_Setting__mdt setting) {
+            String currentTime = String.valueOf(Datetime.now().getTime());
+
+            this.apiKey = setting.Api_Key__c;
+            this.ts = currentTime;
+
+            Blob hmacData = Crypto.generateMac(
+                'hmacSHA1', 
+                Blob.valueOf(currentTime), 
+                Blob.valueOf(setting.Api_Sig__c)
+            );
+
+            this.apiSig = EncodingUtil.convertToHex(hmacData);
+            this.apiUrl = (setting.Use_Sandbox__c) ? setting.Sandbox_Url__c: setting.Production_Url__c;
         }
     }
 
@@ -51,12 +53,12 @@ public class GengoService implements TranslationService {
             this.auth = auth;
         }
 
-        public String postJobs(String relatedRecordId, String objectName, String fieldName, String content) {
+        public String postJobs(String relatedRecordId, String objectName, String fieldName, String jobs) {
             String form = String.format('ts={0}&api_key={1}&api_sig={2}&data={3}', new List<String>{
                 this.auth.ts,
                 this.auth.apiKey,
                 this.auth.apiSig,
-                content
+                jobs
             });
 
             Map<String, String> headers = new Map<String, String>{
@@ -96,7 +98,6 @@ public class GengoService implements TranslationService {
 
             return send('GET', this.auth.apiUrl, null, null);
         }
-
     }
 
     public class Service extends HttpCalloutBase {
@@ -119,9 +120,9 @@ public class GengoService implements TranslationService {
 
     }
 
-    public String submitTranslation(String relatedRecordId, String objectName, String fieldName, String content) {
+    public String submitTranslation(String relatedRecordId, String objectName, String fieldName, String jobs) {
         Job job = new Job(AUTH);
-        return job.postJobs(relatedRecordId, objectName, fieldName, content);
+        return job.postJobs(relatedRecordId, objectName, fieldName, jobs);
     }
 
     public String getTranslationStatus(String jobId) {

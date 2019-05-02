@@ -4,10 +4,10 @@ public interface TranslationService {
 	 * @param relatedRecordId the id of the record that contains the content to be translated
      * @param objectName the name of the object type
      * @param fieldName the name of the field on the object being translated
-     * @param content the content to be translated
+     * @param jobs the jobs containing the content to be translated
 	 * @return String 
 	 */
-    String submitTranslation(String relatedRecordId, String objectName, String fieldName, String content);
+    String submitTranslation(String relatedRecordId, String objectName, String fieldName, String jobs);
 
     /**
 	 * Retrieves status of the translation
