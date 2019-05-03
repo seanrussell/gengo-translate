@@ -65,7 +65,7 @@ public class GengoService implements TranslationService {
                 'Content-Type' => 'application/x-www-form-urlencoded'
             };
 
-            return send('POST', this.auth.apiUrl, form, headers);
+            return send('POST', this.auth.apiUrl + TRANSLATE_JOBS, form, headers);
         }
 
         public String getJobStatus(String jobId) {
@@ -75,7 +75,7 @@ public class GengoService implements TranslationService {
                 this.auth.apiSig
             });
 
-            String apiUrl = String.format(this.auth.apiUrl, new List<String>{ jobId });
+            String apiUrl = String.format(this.auth.apiUrl + JOB_DETAILS + qs, new List<String>{ jobId });
 
             return send('GET', apiUrl, null, null);
         }
@@ -96,12 +96,13 @@ public class GengoService implements TranslationService {
                 this.auth.apiSig
             });
 
-            return send('GET', this.auth.apiUrl, null, null);
+            return send('GET', this.auth.apiUrl + ACCOUNT_BALANCE + qs, null, null);
         }
     }
 
     public class Service extends HttpCalloutBase {
         public final String LANGUAGE_PAIRS = 'translate/service/language_pairs';
+        public final String LANGUAGES = 'translate/service/languages';
         public Auth auth { get; set; }
 
         public Service(Auth auth) {
@@ -115,7 +116,17 @@ public class GengoService implements TranslationService {
                 this.auth.apiSig
             });
 
-            return send('GET', this.auth.apiUrl, null, null);
+            return send('GET', this.auth.apiUrl + LANGUAGE_PAIRS + qs, null, null);
+        }
+
+        public String getLanguages() {
+            String qs = String.format('?ts={0}&api_key={1}&api_sig={2}', new List<String>{
+                this.auth.ts,
+                this.auth.apiKey,
+                this.auth.apiSig
+            });
+
+            return send('GET', this.auth.apiUrl + LANGUAGES + qs, null, null);
         }
 
     }
@@ -135,8 +146,13 @@ public class GengoService implements TranslationService {
         return acct.getAccountBalance();
     }
 
-    public String getLanguages() {
+    public String getLanguagePairs() {
         Service service = new Service(AUTH);
         return service.getLanguagePairs();
+    }
+
+    public String getLanguages() {
+        Service service = new Service(AUTH);
+        return service.getLanguages();
     }
 }

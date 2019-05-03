@@ -1,9 +1,76 @@
 <template>
-    <lightning-card title="Gengo Translate" icon-name="action:web_link">
+    <lightning-card title={cardTitle} icon-name="action:web_link">
         <lightning-button
-                slot="actions"
-                label="Start"
-                onclick={handleStart}>
-            </lightning-button>
+            slot="actions"
+            label="Start Translation"
+            onclick={handleStart}>
+        </lightning-button>
+
+        <div class="slds-m-around_medium">
+            <template if:true={sourceLangs}>
+                <lightning-combobox
+                    name="sourcelanguages"
+                    label="Source language"
+                    value=""
+                    placeholder="Select source language"
+                    options={sourceLangs}
+                    onchange={handleSourceLanguageSelect}
+                    required>
+                </lightning-combobox>
+            </template>
+
+            <template if:true={targetLangs}>
+                <div class="slds-m-top_small">
+                    <lightning-combobox
+                        name="targetlanguages"
+                        label="Target language"
+                        value=""
+                        placeholder="Select target language"
+                        options={targetLangs}
+                        onchange={handleTargetLanguageSelect}
+                        required>
+                    </lightning-combobox>
+                </div>
+
+                <template if:true={availableTiers}>
+                    <div class="slds-m-top_small">
+                        <lightning-radio-group 
+                            name="tierselection"
+                            label="Select Tier"
+                            options={availableTiers}
+                            value={selectedTier}
+                            required
+                            type="button"
+                            onchange={handleTierSelect}>
+                        </lightning-radio-group>
+                    </div>
+                </template>
+
+                <template if:true={showSubmitTranslationButton}>
+                    <div class="slds-m-top_medium">
+                        <lightning-button 
+                            variant="brand" 
+                            label="Submit Translation" 
+                            title="Submit Translation" 
+                            onclick={postTranslation}>
+                        </lightning-button>
+                    </div>
+                </template>
+            </template>
+
+            <template if:true={targetLangError}>
+                <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_light slds-m-top_medium" role="status">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-utility-info" title="information">
+                            <lightning-icon icon-name="utility:info" alternative-text="Info" ></lightning-icon>
+                            <span class="slds-assistive-text">information</span>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p>It looks as if the there are currently no languages into which {selectedSourceLanguage} can be translated, though it may in the future. For now, please choose another source language.</p>
+                    </div>
+                </div>
+            </template>
+        </div>
     </lightning-card>
 </template>
