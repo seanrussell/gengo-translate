@@ -281,9 +281,9 @@ export default class GengoTranslate extends LightningElement {
                 this.resetAllProperties();
 
                 if (submission.opstat === 'ok') {
-                    this.showNotification('Submission Success', 'Translation submission was successful', 'success');
+                    this.showNotification('Success', 'Translation submission was successful', 'success');
                 } else {
-                    this.showNotification('Submission Error', 'An error occurred during the submission of your translation.', 'error');
+                    this.showNotification('Error', 'An error occurred during the submission of your translation.', 'error');
                 }
             })
             .catch(error => {
@@ -297,7 +297,7 @@ export default class GengoTranslate extends LightningElement {
             message: message,
             variant: variant
         });
-        
+
         this.dispatchEvent(event);
     }
 }
