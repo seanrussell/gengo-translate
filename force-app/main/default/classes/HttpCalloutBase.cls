@@ -1,5 +1,5 @@
 public virtual class HttpCalloutBase {
-    
+
     public String send(String method, String endpoint, String body, Map<String, String> headers) {
         Http h = new Http();
 

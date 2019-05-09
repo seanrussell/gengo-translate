@@ -3,6 +3,10 @@
     <label>Gengo</label>
     <protected>false</protected>
     <values>
+        <field>Active__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
         <field>Api_Key__c</field>
         <value xsi:type="xsd:string">dgW3lH-B@^^^6s1W9SbF$I[sDIbxd0{)NSvPEvN)w]7ZbgBIflSTxhr(wSHmq_lT</value>
     </values>
@@ -17,6 +21,10 @@
     <values>
         <field>Sandbox_Url__c</field>
         <value xsi:type="xsd:string">http://api.sandbox.gengo.com/v2/</value>
+    </values>
+    <values>
+        <field>Use_Sandbox__c</field>
+        <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
         <field>Version__c</field>

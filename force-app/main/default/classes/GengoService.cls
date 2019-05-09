@@ -47,6 +47,7 @@ public class GengoService implements TranslationService {
     public class Job extends HttpCalloutBase {
         public final String TRANSLATE_JOBS = 'translate/jobs';
         public final String JOB_DETAILS = 'translate/job/{0}';
+        public final String JOBS_DETAILS = 'translate/jobs/{0}';
         public Auth auth { get; set; }
 
         public Job(Auth auth) {
@@ -54,13 +55,13 @@ public class GengoService implements TranslationService {
         }
 
         public String postJobs(String relatedRecordId, String objectName, String fieldName, String jobs) {
-            String form = String.format('ts={0}&api_key={1}&api_sig={2}&data={3}', new List<String>{
+            String form = String.format(GengoConstants.FORM_DATA, new List<String>{
                 this.auth.ts,
                 this.auth.apiKey,
                 this.auth.apiSig,
                 jobs
             });
-
+            
             Map<String, String> headers = new Map<String, String>{
                 'Content-Type' => 'application/x-www-form-urlencoded'
             };
@@ -69,7 +70,7 @@ public class GengoService implements TranslationService {
         }
 
         public String getJobStatus(String jobId) {
-            String qs = String.format('?ts={0}&api_key={1}&api_sig={2}', new List<String>{
+            String qs = String.format(GengoConstants.QUERY_STRING, new List<String>{
                 this.auth.ts,
                 this.auth.apiKey,
                 this.auth.apiSig
@@ -78,6 +79,18 @@ public class GengoService implements TranslationService {
             String apiUrl = String.format(this.auth.apiUrl + JOB_DETAILS + qs, new List<String>{ jobId });
 
             return send('GET', apiUrl, null, null);
+        }
+
+        public String getJobsDetails(List<Integer> jobIds) {
+            String qs = String.format(GengoConstants.QUERY_STRING, new List<String>{
+                this.auth.ts,
+                this.auth.apiKey,
+                this.auth.apiSig
+            });
+
+            String jobDetails = String.format(JOB_DETAILS, new List<String>{ String.join(jobIds, ',') });
+            
+            return send('GET', this.auth.apiUrl + jobDetails + qs, null, null);
         }
     }
 
@@ -90,7 +103,7 @@ public class GengoService implements TranslationService {
         }
 
         public String getAccountBalance() {
-            String qs = String.format('?ts={0}&api_key={1}&api_sig={2}', new List<String>{
+            String qs = String.format(GengoConstants.QUERY_STRING, new List<String>{
                 this.auth.ts,
                 this.auth.apiKey,
                 this.auth.apiSig
@@ -99,6 +112,28 @@ public class GengoService implements TranslationService {
             return send('GET', this.auth.apiUrl + ACCOUNT_BALANCE + qs, null, null);
         }
     }
+
+    public class TranslationOrder extends HttpCalloutBase {
+        public final String ORDER_DETAILS = 'translate/order/{0}';
+        public Auth auth { get; set; }
+
+        public TranslationOrder(Auth auth) {
+            this.auth = auth;
+        }
+
+        public String getOrder(String orderId) {
+            String qs = String.format(GengoConstants.QUERY_STRING, new List<String>{
+                this.auth.ts,
+                this.auth.apiKey,
+                this.auth.apiSig
+            });
+            
+            String orderDetails = String.format(ORDER_DETAILS, new List<String>{ orderId });
+            
+            return send('GET', this.auth.apiUrl + orderDetails + qs, null, null);
+        }
+    }
+
 
     public class Service extends HttpCalloutBase {
         public final String LANGUAGE_PAIRS = 'translate/service/language_pairs';
@@ -110,7 +145,7 @@ public class GengoService implements TranslationService {
         }
 
         public String getLanguagePairs() {
-            String qs = String.format('?ts={0}&api_key={1}&api_sig={2}', new List<String>{
+            String qs = String.format(GengoConstants.QUERY_STRING, new List<String>{
                 this.auth.ts,
                 this.auth.apiKey,
                 this.auth.apiSig
@@ -120,7 +155,7 @@ public class GengoService implements TranslationService {
         }
 
         public String getLanguages() {
-            String qs = String.format('?ts={0}&api_key={1}&api_sig={2}', new List<String>{
+            String qs = String.format(GengoConstants.QUERY_STRING, new List<String>{
                 this.auth.ts,
                 this.auth.apiKey,
                 this.auth.apiSig
@@ -139,6 +174,16 @@ public class GengoService implements TranslationService {
     public String getTranslationStatus(String jobId) {
         Job job = new Job(AUTH);
         return job.getJobStatus(jobId);
+    }
+
+    public String getOrder(String orderId) {
+        TranslationOrder translationOrder = new TranslationOrder(AUTH);
+        return translationOrder.getOrder(orderId);
+    }
+
+    public String getJobs(List<Integer> jobIds) {
+        Job job = new Job(AUTH);
+        return job.getJobsDetails(jobIds);
     }
 
     public String getAccountBalance() {
