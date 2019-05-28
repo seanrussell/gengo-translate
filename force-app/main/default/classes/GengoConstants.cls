@@ -2,6 +2,13 @@ public class GengoConstants {
     // General
     public static final String JOB_PREFIX = 'job_';
     public static final String STATUS_AVAILABLE = 'available';
+    public static final String PUBLIC_SITE = 'Gengo_Public';
+
+    // Site url formats
+    public static final String CALLBACK_SANDBOX = '{0}{1}-{2}.{3}.force.com/services/apexrest/order';
+    public static final String CALLBACK_PRODUCTION = '{0}{1}.{2}.force.com/services/apexrest/order';
+    public static final String CALLBACK_DEVELOPER = '{0}{1}.{2}.force.com/services/apexrest/order';
+    public static final String CALLBACK_SCRATCH = '{0}sandbox-{1}.{2}.force.com/services/apexrest/order';
 
     // Authentication
     public static final String QUERY_STRING = '?ts={0}&api_key={1}&api_sig={2}';
@@ -25,6 +32,11 @@ public class GengoConstants {
     public static final String JOB_TIER = 'tier';
     public static final String JOB_AUTO_APPROVE = 'auto_approve';
     public static final String JOB_CUSTOM_DATA = 'custom_data';
+    public static final String JOB_CALLBACK_URL = 'callback_url';
+    public static final String JOB_STATUS = 'status';
+    public static final String JOB_ID = 'job_id';
+    public static final String JOB_TARGET_CONTENT = 'body_tgt';
+    public static final String JOB_ORDER_ID = 'order_id';
 
     // Order
     public static final String ORDER_FIELD = 'order';
@@ -35,4 +47,14 @@ public class GengoConstants {
     public static final String ORDER_JOBS_REVISING = 'jobs_revising';
     public static final String ORDER_JOBS_CANCELLED = 'jobs_cancelled';
     public static final String ORDER_JOBS_HELD = 'jobs_held';
+
+    public static final Set<String> ORDER_STATUSES = new Set<String>{
+        ORDER_JOBS_REVIEWABLE,
+        ORDER_JOBS_AVAILABLE,
+        ORDER_JOBS_PENDING,
+        ORDER_JOBS_APPROVED,
+        ORDER_JOBS_REVISING,
+        ORDER_JOBS_CANCELLED,
+        ORDER_JOBS_HELD
+    };
 }

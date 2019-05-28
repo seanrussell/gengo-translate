@@ -16,6 +16,12 @@ public interface TranslationService {
 	 */
     String getTranslationStatus(String jobId);
 
+	/**
+	 * Retrieves an order by id
+	 * @param orderId the id of the order to retrieve
+	 */
+	String getOrder(String orderId);
+
     /**
 	 * Retrieves account balance
 	 * @return String 

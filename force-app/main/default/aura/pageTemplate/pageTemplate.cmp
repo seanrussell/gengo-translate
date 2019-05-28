@@ -1,0 +1,27 @@
+<aura:component
+    implements="lightning:appHomeTemplate"
+    description="Two columns layout"
+    access="global"
+>
+    <aura:attribute name="topleft" type="Aura.Component[]" access="global" />
+    <aura:attribute name="bottomleft" type="Aura.Component[]" access="global" />
+    <aura:attribute name="right" type="Aura.Component[]" access="global" />
+
+    <div aura:id="container">
+        <lightning:layout>
+            <lightning:layoutItem aura:id="leftColumn" size="4">
+                <div>
+                    {!v.topleft}
+                </div>
+                <div class="bottomleft">
+                    {!v.bottomleft}
+                </div>
+            </lightning:layoutItem>
+            <lightning:layoutItem aura:id="rightColumn" size="8">
+                <div class="right">
+                    {!v.right}
+                </div>
+            </lightning:layoutItem>
+        </lightning:layout>
+    </div>
+</aura:component>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>List of translations</description>
+    <flexiPageRegions>
+        <componentInstances>
+            <componentName>c:translationFilter</componentName>
+        </componentInstances>
+        <name>topleft</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <componentInstances>
+            <componentName>c:translationListContainer</componentName>
+        </componentInstances>
+        <name>bottomleft</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <flexiPageRegions>
+        <componentInstances>
+            <componentName>c:translationDetailContainer</componentName>
+        </componentInstances>
+        <name>right</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <masterLabel>Translation Records</masterLabel>
+    <template>
+        <name>pageTemplate</name>
+    </template>
+    <type>AppPage</type>
+</FlexiPage>

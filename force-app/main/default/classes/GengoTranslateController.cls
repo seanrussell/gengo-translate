@@ -62,13 +62,13 @@ public with sharing class GengoTranslateController {
 
         String result = service.submitTranslation(data.relatedRecordId, data.objectName, data.fieldName, convertJobsPayload(data.jobs));
         
-        GengoTranslationSubmitResponse translationSubmitResponse = (GengoTranslationSubmitResponse)JSON.deserialize(result, GengoTranslationSubmitResponse.class);
+        GengoResponse.TranslationSubmitResponse translationSubmitResponse = (GengoResponse.TranslationSubmitResponse)JSON.deserialize(result, GengoResponse.TranslationSubmitResponse.class);
 
         SubmissionResult submissionResult = new SubmissionResult();
         submissionResult.status = translationSubmitResponse.opstat;
 
         if (!String.isBlank(translationSubmitResponse.opstat) && translationSubmitResponse.opstat == GengoConstants.OK_STATUS) {
-            submissionResult.translations = createTranslations(data.relatedRecordId, data.objectName, data.jobs, String.valueOf(translationSubmitResponse.response.order_id));
+            submissionResult.translations = createTranslations(data.relatedRecordId, data.objectName, data.fieldName, data.jobs, String.valueOf(translationSubmitResponse.response.order_id));
         } 
 
         return submissionResult;
@@ -124,11 +124,16 @@ public with sharing class GengoTranslateController {
             jobBody.put(GengoConstants.JOB_TYPE, job.type);
             jobBody.put(GengoConstants.JOB_SLUG, job.slug);
             jobBody.put(GengoConstants.JOB_SOURCE_CONTENT, job.sourceContent);
-            jobBody.put(GengoConstants.JOB_SOURCE_LANGUAGE, job.sourceLanguage);
-            jobBody.put(GengoConstants.JOB_TARGET_LANGUAGE, job.targetLanguage);
+            jobBody.put(GengoConstants.JOB_SOURCE_LANGUAGE, job.sourceLanguageCode);
+            jobBody.put(GengoConstants.JOB_TARGET_LANGUAGE, job.targetLanguageCode);
             jobBody.put(GengoConstants.JOB_TIER, job.tier);
             jobBody.put(GengoConstants.JOB_AUTO_APPROVE, job.autoApprove);
             jobBody.put(GengoConstants.JOB_CUSTOM_DATA, job.customData);
+            
+            if (hasCallbackUrl()) {
+                String callbackUrl = getCallbackUrl();
+                jobBody.put(GengoConstants.JOB_CALLBACK_URL, callbackUrl);
+            }
 
             Map<String, Object> jobsBody = jobsPayload.get(GengoConstants.JOBS_FIELD);
 
@@ -141,13 +146,13 @@ public with sharing class GengoTranslateController {
     }
 
     private static String retrieveJobsForOrder(String translationOrder) {
-        GengoTranslationOrderResponse translationOrderResponse = (GengoTranslationOrderResponse)JSON.deserialize(translationOrder, GengoTranslationOrderResponse.class);
+        GengoResponse.TranslationOrderResponse translationOrderResponse = (GengoResponse.TranslationOrderResponse)JSON.deserialize(translationOrder, GengoResponse.TranslationOrderResponse.class);
 
         List<Integer> jobIds = new List<Integer>();
 
         if (!String.isBlank(translationOrderResponse.opstat) && translationOrderResponse.opstat == GengoConstants.OK_STATUS) {
-            OrderRetrieveResponse orderRetriveResponse = translationOrderResponse.response;
-            OrderResponse orderResponse = orderRetriveResponse.order;
+            GengoResponse.RetrieveResponse orderRetrieveResponse = translationOrderResponse.response;
+            GengoResponse.OrderResponse orderResponse = orderRetrieveResponse.order;
         
             jobIds = getJobIdsForOrder(orderResponse);
         }
@@ -155,7 +160,7 @@ public with sharing class GengoTranslateController {
         return service.getJobs(jobIds);
     }
 
-    private static List<Translation> createTranslations(String relatedRecordId, String objectName, List<Job> jobs, String orderId) {
+    private static List<Translation> createTranslations(String relatedRecordId, String objectName, String fieldName, List<Job> jobs, String orderId) {
         List<Translation__c> translations = new List<Translation__c>();
            
         for (Job job: jobs) {
@@ -165,8 +170,11 @@ public with sharing class GengoTranslateController {
                 Source_Content__c = job.sourceContent,
                 Source_Language__c = job.sourceLanguage,
                 Target_Language__c = job.targetLanguage,
+                Source_Language_Code__c = job.sourceLanguageCode,
+                Target_Language_Code__c = job.targetLanguageCode,
                 Status__c = GengoConstants.STATUS_AVAILABLE,
                 Object_Name__c = objectName,
+                Field_Name__c = fieldName,
                 Record_Id__c = relatedRecordId
             ));
         }
@@ -188,7 +196,7 @@ public with sharing class GengoTranslateController {
         return trans;
     }
 
-    private static List<Integer> getJobIdsForOrder(OrderResponse orderResponse) {
+    private static List<Integer> getJobIdsForOrder(GengoResponse.OrderResponse orderResponse) {
         List<Integer> jobIds = new List<Integer>();
 
         if (orderResponse.jobs_reviewable != null && !orderResponse.jobs_reviewable.isEmpty()) {
@@ -232,15 +240,110 @@ public with sharing class GengoTranslateController {
         return (String) so.get(fieldName);
     }
 
+    private static Boolean hasCallbackUrl() {
+        String soql = 'SELECT COUNT() FROM Site WHERE Name = \'' + GengoConstants.PUBLIC_SITE + '\' AND Status = \'Active\'';
+        return (Database.countQuery(soql) > 0);
+    }
+
+    private static String getCallbackUrl() {
+        List<Site> publicSites = [
+            SELECT 
+                GuestUserId, 
+                Name,
+                MasterLabel, 
+                Subdomain, 
+                OptionsRequireHttps, 
+                UrlPathPrefix 
+            FROM 
+                Site 
+            WHERE 
+                Status = 'Active' 
+                AND Name = :GengoConstants.PUBLIC_SITE
+        ];
+        
+        List<Organization> orgs = [
+            SELECT 
+                InstanceName,
+                Name, 
+                IsSandbox, 
+                OrganizationType 
+            FROM 
+                Organization
+        ];
+
+        String url;
+
+        if(!publicSites.isEmpty()) {
+            Site s = publicSites.get(0);
+            Organization org = orgs.get(0);
+
+            if (s.Subdomain != null) {
+                String subdomain = s.Subdomain;
+                String instanceName = org.InstanceName.toLowerCase();
+                String httpStr = 'http://';
+
+                if(s.OptionsRequireHttps == true) {
+                    httpStr = 'https://';
+                }
+
+                // PRODUCTION
+                if (!org.IsSandbox && org.OrganizationType != 'Developer Edition') {
+                    url = String.format(GengoConstants.CALLBACK_PRODUCTION, new List<String>{
+                        httpStr,
+                        subdomain,
+                        instanceName
+                    });
+                }            
+
+                // SANBOX
+                if (org.IsSandbox && org.OrganizationType != 'Developer Edition') {
+                    url = String.format(GengoConstants.CALLBACK_SANDBOX, new List<String>{
+                        httpStr,
+                        UserInfo.getUserName().substringAfterLast('.'),
+                        subdomain,
+                        instanceName
+                    });
+                }
+
+                // DEVELOPER
+                if (!org.IsSandbox && org.OrganizationType == 'Developer Edition') {
+                    url = String.format(GengoConstants.CALLBACK_DEVELOPER, new List<String>{
+                        httpStr,
+                        subdomain,
+                        instanceName
+                    });
+                }
+
+                // SCRATCH 
+                if (org.IsSandbox && org.OrganizationType == 'Developer Edition') {
+                    url = String.format(GengoConstants.CALLBACK_SCRATCH, new List<String>{
+                        httpStr,
+                        subdomain,
+                        instanceName
+                    });
+                }
+
+                if (s.UrlPathPrefix != null) {
+                    url += '/' + s.UrlPathPrefix; 
+                }
+            }
+        }  
+
+        return url;
+    }
+
     public class Job {
         public String type { get; set; }
         public String slug { get; set; }
         public String sourceContent { get; set; }
         public String sourceLanguage { get; set; }
         public String targetLanguage { get; set; }
+        public String sourceLanguageCode { get; set; }
+        public String targetLanguageCode { get; set; }
         public String tier { get; set; }
         public Integer autoApprove { get; set; }
         public String customData { get; set; }
+        public String callbackUrl { get; set; }
     }
 
     public class Payload {
@@ -293,64 +396,5 @@ public with sharing class GengoTranslateController {
 
         @AuraEnabled
         public List<Translation> translations { get; set; }
-    }
-
-    public class TranslationSubmitResponse {
-        public Integer job_count { get; set; }
-        public Integer order_id { get; set; }
-        public Decimal credits_used { get; set; }
-    }
-
-    public class OrderResponse {
-        public Integer jobs_queued { get; set; }
-        public List<Integer> jobs_reviewable { get; set; }
-        public List<Integer> jobs_available { get; set; }
-        public List<Integer> jobs_pending { get; set; }
-        public List<Integer> jobs_approved { get; set; }
-        public List<Integer> jobs_revising { get; set; }
-        public List<Integer> jobs_cancelled { get; set; }
-        public List<Integer> jobs_held { get; set; }
-        public String order_id { get; set; }
-        public String total_credits { get; set; }
-        public Integer total_units { get; set; }
-        public String total_jobs { get; set; }
-    }
-
-    public class OrderRetrieveResponse {
-        public OrderResponse order { get; set; }
-    }
-
-    public class JobsReponse {
-        public String custom_data { get; set; }
-        public String job_id { get; set; }
-        public String credits { get; set; }
-        public Integer auto_approve { get; set; }
-        public String order_id { get; set; }
-        public String lc_tgt { get; set; }
-        public String lc_src { get; set; }
-        public String slug { get; set; }
-        public String tier { get; set; }
-        public String body_src { get; set; }
-        public String status { get; set; }
-    }
-
-    public class JobsRetrieveResponse {
-        public List<JobsReponse> jobs { get; set; }
-    }
-
-    public virtual class GengoResponse {
-        public String opstat { get; set; }
-    }
-
-    public class GengoTranslationSubmitResponse extends GengoResponse {
-        public TranslationSubmitResponse response { get; set; }
-    }
-
-    public class GengoTranslationOrderResponse extends GengoResponse {
-        public OrderRetrieveResponse response { get; set; }
-    }
-
-    public class GengoTranslationJobsResponse extends GengoResponse {
-        public JobsRetrieveResponse response { get; set; }
     }
 }

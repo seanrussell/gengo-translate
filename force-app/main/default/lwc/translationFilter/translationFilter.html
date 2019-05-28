@@ -1,0 +1,15 @@
+<template>
+    <lightning-card title="Translation Filters" icon-name="utility:feed">
+        <div class="content">
+            <div class="slds-p-top_x-small">
+                <c-status-search-bar onchange={handleStatusChange}></c-status-search-bar>
+            </div>
+            <div class="slds-p-top_x-small">
+                <c-source-language-search-bar onchange={handleSourceLanguageChange}></c-source-language-search-bar>
+            </div>
+            <div class="slds-p-top_x-small">
+                <c-target-language-search-bar onchange={handleTargetLanguageChange}></c-target-language-search-bar>
+            </div>
+        </div>
+    </lightning-card>
+</template>

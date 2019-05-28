@@ -21,7 +21,7 @@ public virtual class HttpCalloutBase {
         }
 
         HttpResponse response = h.send(request);
-
+        
         return response.getBody();
     }
 }

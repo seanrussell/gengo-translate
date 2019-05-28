@@ -134,7 +134,6 @@ public class GengoService implements TranslationService {
         }
     }
 
-
     public class Service extends HttpCalloutBase {
         public final String LANGUAGE_PAIRS = 'translate/service/language_pairs';
         public final String LANGUAGES = 'translate/service/languages';
@@ -163,7 +162,6 @@ public class GengoService implements TranslationService {
 
             return send('GET', this.auth.apiUrl + LANGUAGES + qs, null, null);
         }
-
     }
 
     public String submitTranslation(String relatedRecordId, String objectName, String fieldName, String jobs) {

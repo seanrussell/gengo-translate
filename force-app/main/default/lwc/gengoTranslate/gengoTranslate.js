@@ -1,20 +1,24 @@
 /* Base Lightning */
-import { LightningElement, api, track, wire } from 'lwc';
-import { ShowToastEvent } from 'lightning/platformShowToastEvent'
+import { LightningElement, api, track } from 'lwc';
+import { ShowToastEvent } from 'lightning/platformShowToastEvent';
+import { NavigationMixin } from 'lightning/navigation';
 
 /* Apex methods */
+import getFieldsForObject from '@salesforce/apex/GengoTranslateController.getFieldsForObject';
 import getFieldContentToTranslate from '@salesforce/apex/GengoTranslateController.getFieldContentToTranslate';
 import getLanguages from '@salesforce/apex/GengoTranslateController.getLanguages';
 import getLanguagePairs from '@salesforce/apex/GengoTranslateController.getLanguagePairs';
 import getAccountBalance from '@salesforce/apex/GengoTranslateController.getAccountBalance';
 import submitTranslation from '@salesforce/apex/GengoTranslateController.submitTranslation';
 
-export default class GengoTranslate extends LightningElement {
+export default class GengoTranslate extends NavigationMixin(LightningElement) {
     @api fieldName;
     @api recordId;
     @api objectApiName;
 
     @track error;
+    @track objectFields;
+    @track objectFieldsError;
     @track sourceLangs;
     @track targetLangs;
     @track targetLangError;
@@ -32,24 +36,15 @@ export default class GengoTranslate extends LightningElement {
     tiersForSelection;
     fieldContentToTranslate;
     selectedTier;
-    
-    get cardTitle() {
-        return 'Translate ' + this.fieldName;
-    }
+    selectedField;
 
-    connectedCallback() {
-        getFieldContentToTranslate({recordId: this.recordId, objectName: this.objectApiName, fieldName: this.fieldName})
-            .then(result => {
-                this.fieldContentToTranslate = result;
-            })
-            .catch(error => {
-                this.error = error;
-            });
-    }
+    connectedCallback() {}
 
     resetProperties() {
         this.error = false;
         this.targetLangError = false;
+        this.objectFields = false;
+        this.objectFieldsError = false;
         this.targetLangs = null;
         this.availableTiers = null;
         this.selectedTier = '';
@@ -61,11 +56,35 @@ export default class GengoTranslate extends LightningElement {
         this.resetProperties();
         this.selectedSourceLanguage = '';
         this.selectedSourceLanguageCode = '';
+        this.sourceLangs = null;
         this.targetLangError = null;
         this.showSubmitTranslationButton = false;
     }
 
     handleStart() {
+        if (!this.objectFields) {
+            this.retrieveObjectFields();
+        }
+    }
+
+    retrieveObjectFields() {
+        getFieldsForObject({objectName: this.objectApiName})
+            .then(result => {
+                const fields = JSON.parse(result);
+                
+                if (fields.length > 0) {
+                    this.retrieveLanguagesAndAccount();
+                    this.setObjectFieldsList(fields);
+                } else {
+                    this.objectFieldsError = true;
+                }
+            })
+            .catch(error => {
+                this.error = error;
+            });
+    }
+
+    retrieveLanguagesAndAccount() {
         if (!this.sourceLangs) {
             this.retrieveLanguages();
         }
@@ -77,13 +96,24 @@ export default class GengoTranslate extends LightningElement {
         this.retrieveAccountBalance();
     }
 
+    setObjectFieldsList(fields) {
+        const flds = [];
+
+        fields.forEach(fld => {
+            flds.push({
+                label: fld.label,
+                value: fld.name
+            });
+        });
+
+        this.objectFields = flds;
+    }
+
     retrieveLanguages() {
         getLanguages()
             .then(result => {
                 const items = JSON.parse(result).response;
-
                 this.codeToLanguage = this.mapCodesToLanguage(items);
-
                 this.sourceLangs = this.setSourceLanguages();
             })
             .catch(error => {
@@ -95,13 +125,8 @@ export default class GengoTranslate extends LightningElement {
         getLanguagePairs()
             .then(result => {
                 const items = JSON.parse(result).response;
-                console.log('ITEMS: ', items);
-
                 this.pairs = this.getPairs(items);
-                console.log('PAIRS: ', this.pairs);
-
                 this.tierPrices = this.getTierPrices(items);
-                console.log('TIER PRICES: ', this.tierPrices);
             })
             .catch(error => {
                 this.error = error;
@@ -177,6 +202,18 @@ export default class GengoTranslate extends LightningElement {
         return tiers;
     }
 
+    handleObjectFieldSelect(event) {
+        this.selectedField = event.detail.value;
+
+        getFieldContentToTranslate({recordId: this.recordId, objectName: this.objectApiName, fieldName: this.selectedField})
+            .then(result => {
+                this.fieldContentToTranslate = result;
+            })
+            .catch(error => {
+                this.error = error;
+            });
+    }
+
     handleSourceLanguageSelect(event) {
         this.resetProperties();
         
@@ -238,52 +275,42 @@ export default class GengoTranslate extends LightningElement {
         return {
             "type": "text",
             "slug": "Translation :: " + this.selectedSourceLanguage + ' to ' + this.selectedTargetLanguage,
-            "body_src": this.fieldContentToTranslate,
-            "lc_src": this.selectedSourceLanguageCode,
-            "lc_tgt": this.selectedTargetLanguageCode,
+            "sourceContent": this.fieldContentToTranslate,
+            "sourceLanguageCode": this.selectedSourceLanguageCode,
+            "targetLanguageCode": this.selectedTargetLanguageCode,
+            "sourceLanguage": this.selectedSourceLanguage,
+            "targetLanguage": this.selectedTargetLanguage,
             "tier": this.selectedTier,
-            "auto_approve": 1,
-            "custom_data": this.recordId + "|" + this.objectApiName + "|" + this.fieldName
+            "autoApprove": 1,
+            "customData": this.recordId + "|" + this.objectApiName + "|" + this.selectedField
         };
-    }
-
-    getJobs(jobDetails) {
-        const jobs = {
-            "jobs": {}
-        };
-
-        jobDetails.forEach((obj, i) => {
-            jobs.jobs['job_' + i] = obj;
-        });
-
-        return jobs;
     }
 
     getPayloadData(jobs) {
         return {
             "relatedRecordId": this.recordId,
             "objectName": this.objectApiName,
-            "fieldName": this.fieldName,
+            "fieldName": this.selectedField,
             "jobs": jobs
         }
     }
 
     postTranslation() {
         const jobDetail = this.getJobDetail();
-        const jobs = this.getJobs([jobDetail]);
-        const data = this.getPayloadData(JSON.stringify(jobs));
+        const data = this.getPayloadData([jobDetail]);
 
         submitTranslation({ payload: JSON.stringify(data) } )
             .then(result => {
                 console.log('TRANS RES: ', result);
-                const submission = JSON.parse(result);
-
+                
                 this.resetAllProperties();
 
-                if (submission.opstat === 'ok') {
+                if (result.status === 'ok') {
                     this.showNotification('Success', 'Translation submission was successful', 'success');
+                    this.showSuccessMessage = true;
                 } else {
                     this.showNotification('Error', 'An error occurred during the submission of your translation.', 'error');
+                    this.showSuccessMessage = false;
                 }
             })
             .catch(error => {
@@ -299,5 +326,19 @@ export default class GengoTranslate extends LightningElement {
         });
 
         this.dispatchEvent(event);
+    }
+
+    handleTranslationListClick(event) {
+        event.preventDefault();
+
+        this[NavigationMixin.Navigate]({
+            type: 'standard__navItemPage',
+            attributes: {
+                apiName: 'Translation'
+            },
+            state: {
+                recordId: this.recordId
+            }
+        });
     }
 }

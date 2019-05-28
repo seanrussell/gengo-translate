@@ -1,0 +1,27 @@
+<template>
+    <template if:true={result}>
+        <lightning-card title="Translations" icon-name="standard:channel_programs">
+            <template if:true={result.translationListItems.length}>
+                <div class="slds-p-around_medium">
+                    <template for:each={result.translationListItems} for:item="translation">
+                        <lightning-tile label={translation.slug} type="media" key={translation.id} onclick={handleClick}>
+                            <lightning-icon slot="media" icon-name="standard:channel_program_levels" size="small"></lightning-icon>
+                            <ul class="slds-list_horizontal slds-has-dividers_right">
+                                <li class="slds-item">{translation.status}</li>
+                                <li class="slds-item">{translation.sourceLanguage} &gt; {translation.targetLanguage}</li>
+                            </ul>
+                        </lightning-tile>
+                    </template>
+
+                    <c-paginator
+                        page={page}
+                        pages={result.pages}
+                        label="translations"
+                        onpreviouspage={handlePagePrevious}
+                        onnextpage={handlePageNext}>
+                    </c-paginator>
+                </div>
+            </template>
+        </lightning-card>
+    </template>
+</template>

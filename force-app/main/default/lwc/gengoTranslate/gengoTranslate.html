@@ -100,6 +100,20 @@
                     </div>
                 </div>
             </template>
+
+            <template if:true={showSuccessMessage}>
+                <div class="slds-scoped-notification slds-media slds-media_center slds-scoped-notification_light slds-m-top_medium" role="status">
+                    <div class="slds-media__figure">
+                        <span class="slds-icon_container slds-icon-utility-info" title="information">
+                            <lightning-icon icon-name="utility:info" alternative-text="Info" ></lightning-icon>
+                            <span class="slds-assistive-text">information</span>
+                        </span>
+                    </div>
+                    <div class="slds-media__body">
+                        <p>To view the status of your submitted translations, please visit the <a href="#" title="Translation list" onclick={handleTranslationListClick}>translations list</a> page.</p>
+                    </div>
+                </div>
+            </template>
         </div>
     </lightning-card>
 </template>
