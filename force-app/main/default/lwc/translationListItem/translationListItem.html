@@ -1,0 +1,9 @@
+<template>
+    <lightning-tile label={translationListItem.slug} type="media" onclick={handleClick}>
+        <lightning-icon slot="media" icon-name="standard:channel_program_levels" size="small"></lightning-icon>
+        <ul class="slds-list_horizontal slds-has-dividers_right">
+            <li class="slds-item">{translationListItem.status}</li>
+            <li class="slds-item">{translationListItem.sourceLanguage} &gt; {translationListItem.targetLanguage}</li>
+        </ul>
+    </lightning-tile>
+</template>

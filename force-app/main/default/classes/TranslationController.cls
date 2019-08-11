@@ -41,7 +41,6 @@ public with sharing class TranslationController {
         }
 
         result.translationListItems = translationListItems;
-        System.debug(LoggingLevel.WARN, 'RESULT: ' + result);
         return result;
     }
 
@@ -57,6 +56,7 @@ public with sharing class TranslationController {
         TranslationDetailItem translationDetailItem = new TranslationDetailItem(
             translation.Id,
             translation.Object_Name__c,
+            translation.Field_Name__c,
             translation.Status__c,
             translation.Slug__c,
             translation.Job_Id__c,
@@ -134,6 +134,7 @@ public with sharing class TranslationController {
             SELECT 
                 Id,
                 Object_Name__c,
+                Field_Name__c,
                 Status__c,
                 Slug__c,
                 Job_Id__c,
@@ -212,6 +213,9 @@ public with sharing class TranslationController {
         public String objectName { get; set; }
 
         @AuraEnabled
+        public String fieldName { get; set; }
+
+        @AuraEnabled
         public String status { get; set; }
 
         @AuraEnabled
@@ -238,11 +242,12 @@ public with sharing class TranslationController {
         @AuraEnabled
         public Boolean acknowledged { get; set; }
 
-        public TranslationDetailItem(String id, String objectName, String status, String slug,
+        public TranslationDetailItem(String id, String objectName, String fieldName, String status, String slug,
                                      String jobId, String orderId, String sourceContent, String sourceLanguage,
                                      String targetLanguage, String translatedContent, Boolean acknowledged) {
             this.id = id;
             this.objectName = objectName;
+            this.fieldName = fieldName;
             this.status = status;
             this.slug = slug;
             this.jobId = jobId;

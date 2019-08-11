@@ -3,7 +3,7 @@ import { LightningElement, track, wire } from 'lwc';
 import { CurrentPageReference } from 'lightning/navigation';
 
 /* Pubsub */
-import { registerListener, unregisterAllListeners } from 'c/pubsub';
+import { registerListener, unregisterAllListeners, fireEvent } from 'c/pubsub';
 
 /* Apex methods */
 import retrieveTranslations from '@salesforce/apex/TranslationController.retrieveTranslations';
@@ -14,6 +14,7 @@ const PAGE_SIZE = 10;
 export default class TranslationListContainer extends LightningElement {
     @track recordId = '';
     @track result;
+    @track translationListItems;
     @track error;
     @track page = 1;
     @track filterObjectStringified;
@@ -86,16 +87,18 @@ export default class TranslationListContainer extends LightningElement {
         console.log('P NUM: ', this.page);
         retrieveTranslations({ recordId: this.recordId, filters: this.filterObjectStringified, pageSize: this.pageSize, pageNumber: this.page })
             .then(result => {
-                console.log('RES: ', result);
-                this.result = result;
+                if (result) {
+                    this.result = result;
+                    this.translationListItems = result.translationListItems;
+                }
             })
             .catch(error => {
-                console.log('ERR: ', error);
                 this.error = error;
             });
     }
 
     handleClick(event) {
         event.preventDefault();
+        fireEvent(this.pageRef, 'translationSelected', event.detail);
     }
 }

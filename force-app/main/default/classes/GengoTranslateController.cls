@@ -132,6 +132,7 @@ public with sharing class GengoTranslateController {
             
             if (hasCallbackUrl()) {
                 String callbackUrl = getCallbackUrl();
+                System.debug(LoggingLevel.WARN, 'CALLBACK URL --> ' + callbackUrl);
                 jobBody.put(GengoConstants.JOB_CALLBACK_URL, callbackUrl);
             }
 

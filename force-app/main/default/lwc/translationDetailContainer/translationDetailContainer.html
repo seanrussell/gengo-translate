@@ -1,7 +1,107 @@
 <template>
     <lightning-card title="Translation Detail" icon-name="standard:channel_programs">
-        <template if:true={translation}>
-            
+        <template if:true={translationDetail}>   
+            <lightning-layout horizontal-align="spread">
+                <lightning-layout-item padding="around-small">
+                    <div class="header-column">
+                        <p class="field-title" title="Slug">Slug</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.slug}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+            <template if:true={currentStep}>
+                <lightning-layout horizontal-align="spread">
+                    <lightning-layout-item padding="around-small" size="12">
+                        <div class="header-column">
+                            <p class="field-title" title="Status">Status</p>
+                            <p>
+                                <lightning-layout vertical-align="center">
+                                    <lightning-layout-item flexibility="grow">
+                                        <lightning-progress-indicator current-step={currentStep} type="path" variant="base">
+                                            <lightning-progress-step label="Available" value="1"></lightning-progress-step>
+                                            <lightning-progress-step label="Pending" value="2"></lightning-progress-step>
+                                            <lightning-progress-step label="In Progress" value="3"></lightning-progress-step>
+                                            <lightning-progress-step label="Reviewable" value="4"></lightning-progress-step>
+                                            <lightning-progress-step label="Approved" value="5"></lightning-progress-step>
+                                        </lightning-progress-indicator>
+                                    </lightning-layout-item>
+                                </lightning-layout>
+                            </p>
+                        </div>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </template>
+            <lightning-layout horizontal-align="spread">
+                <lightning-layout-item padding="around-small">
+                    <div class="header-column">
+                        <p class="field-title" title="Object Name">Object Name</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.objectName}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small">
+                    <div class="header-column">
+                        <p class="field-title" title="Field Name">Field Name</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.fieldName}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small">
+                    <div class="header-column">
+                        <p class="field-title" title="Source Language">Source Language</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.sourceLanguage}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small">
+                    <div class="header-column">
+                        <p class="field-title" title="Target Language">Target Language</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.targetLanguage}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small">
+                    <div class="header-column">
+                        <p class="field-title" title="Order Id">Order Id</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.orderId}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small">
+                    <div class="header-column">
+                        <p class="field-title" title="Acknowledged">Acknowledged</p>
+                        <p>
+                            <lightning-input type="checkbox" label="" disabled checked if:true={translationDetail.acknowledged}></lightning-input>
+                            <lightning-input type="checkbox" label="" disabled if:false={translationDetail.acknowledged}></lightning-input>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+            </lightning-layout>
+            <lightning-layout horizontal-align="spread">
+                <lightning-layout-item padding="around-small" size="6">
+                    <div class="header-column">
+                        <p class="field-title" title="Source Content">Source Content</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.sourceContent}></lightning-formatted-text>
+                        </p>
+                    </div>
+                </lightning-layout-item>
+                <lightning-layout-item padding="around-small" size="6">
+                        <div class="header-column">
+                            <p class="field-title" title="Target Content">Target Content</p>
+                            <p>
+                                <lightning-formatted-text value={translationDetail.targetContent}></lightning-formatted-text>
+                            </p>
+                        </div>
+                </lightning-layout-item>
+            </lightning-layout>
         </template>
     </lightning-card>
 </template>

@@ -43,7 +43,6 @@ export default class GengoTranslate extends NavigationMixin(LightningElement) {
     resetProperties() {
         this.error = false;
         this.targetLangError = false;
-        this.objectFields = false;
         this.objectFieldsError = false;
         this.targetLangs = null;
         this.availableTiers = null;
@@ -329,15 +328,11 @@ export default class GengoTranslate extends NavigationMixin(LightningElement) {
     }
 
     handleTranslationListClick(event) {
-        event.preventDefault();
-
+        console.log('CLICK TRANSLATION LIST LINK');
         this[NavigationMixin.Navigate]({
             type: 'standard__navItemPage',
             attributes: {
                 apiName: 'Translation'
-            },
-            state: {
-                recordId: this.recordId
             }
         });
     }
