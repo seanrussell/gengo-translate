@@ -280,7 +280,7 @@ export default class GengoTranslate extends NavigationMixin(LightningElement) {
             "sourceLanguage": this.selectedSourceLanguage,
             "targetLanguage": this.selectedTargetLanguage,
             "tier": this.selectedTier,
-            "autoApprove": 1,
+            "autoApprove": 0,
             "customData": this.recordId + "|" + this.objectApiName + "|" + this.selectedField
         };
     }

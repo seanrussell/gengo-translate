@@ -92,6 +92,23 @@ public class GengoService implements TranslationService {
             
             return send('GET', this.auth.apiUrl + jobDetails + qs, null, null);
         }
+
+        public String updateJob(String jobId, String action) {
+            String form = String.format(GengoConstants.FORM_DATA, new List<String>{
+                this.auth.ts,
+                this.auth.apiKey,
+                this.auth.apiSig,
+                '{ "action": "' + action + '"}'
+            });
+            
+            Map<String, String> headers = new Map<String, String>{
+                'Content-Type' => 'application/x-www-form-urlencoded'
+            };
+
+            String putUrl = String.format(JOB_DETAILS, new List<String>{ jobId });
+        
+            return send('PUT', this.auth.apiUrl + putUrl, form, headers);
+        }
     }
 
     public class Acct extends HttpCalloutBase {
@@ -197,5 +214,10 @@ public class GengoService implements TranslationService {
     public String getLanguages() {
         Service service = new Service(AUTH);
         return service.getLanguages();
+    }
+
+    public String updateTranslation(String jobId, String action) {
+        Job job = new Job(AUTH);
+        return job.updateJob(jobId, action);
     }
 }

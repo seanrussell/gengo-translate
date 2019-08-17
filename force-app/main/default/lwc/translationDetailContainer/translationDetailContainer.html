@@ -1,5 +1,11 @@
 <template>
     <lightning-card title="Translation Detail" icon-name="standard:channel_programs">
+        <template if:true={currentStep}>
+            <template if:true={isReviewable}>
+                <lightning-button label="Approve" slot="actions" variant="success" onclick={approveTranslation} class="slds-m-right_x-small"></lightning-button>
+                <lightning-button label="Reject" slot="actions" variant="destructive" onclick={rejectTranslation}></lightning-button>
+            </template>
+        </template>
         <template if:true={translationDetail}>   
             <lightning-layout horizontal-align="spread">
                 <lightning-layout-item padding="around-small">
@@ -76,10 +82,9 @@
                 </lightning-layout-item>
                 <lightning-layout-item padding="around-small">
                     <div class="header-column">
-                        <p class="field-title" title="Acknowledged">Acknowledged</p>
+                        <p class="field-title" title="Record">Record</p>
                         <p>
-                            <lightning-input type="checkbox" label="" disabled checked if:true={translationDetail.acknowledged}></lightning-input>
-                            <lightning-input type="checkbox" label="" disabled if:false={translationDetail.acknowledged}></lightning-input>
+                            <lightning-button variant="base" label="View Record" title="View Record" onclick={redirectToRecord}></lightning-button>
                         </p>
                     </div>
                 </lightning-layout-item>
@@ -94,14 +99,19 @@
                     </div>
                 </lightning-layout-item>
                 <lightning-layout-item padding="around-small" size="6">
-                        <div class="header-column">
-                            <p class="field-title" title="Target Content">Target Content</p>
-                            <p>
-                                <lightning-formatted-text value={translationDetail.targetContent}></lightning-formatted-text>
-                            </p>
-                        </div>
+                    <div class="header-column">
+                        <p class="field-title" title="Target Content">Target Content</p>
+                        <p>
+                            <lightning-formatted-text value={translationDetail.translatedContent}></lightning-formatted-text>
+                        </p>
+                    </div>
                 </lightning-layout-item>
             </lightning-layout>
+        </template>
+        <template if:false={translationDetail}>
+            <div class="slds-m-vertical_large slds-align_absolute-center">
+                Select a translation to view from the left.
+            </div>
         </template>
     </lightning-card>
 </template>

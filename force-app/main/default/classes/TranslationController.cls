@@ -65,7 +65,8 @@ public with sharing class TranslationController {
             translation.Source_Language__c,
             translation.Target_Language__c,
             translation.Translated_Content__c,
-            translation.Acknowledged__c
+            translation.Acknowledged__c,
+            translation.Record_Id__c
         );
 
         return JSON.serialize(translationDetailItem);
@@ -113,11 +114,11 @@ public with sharing class TranslationController {
         }
 
         if (String.isNotBlank(sourceLanguage)) {
-            conditionals.add('Source_Language__c = :sourceLanguage');
+            conditionals.add('Source_Language__c = :sourceLanguage OR Source_Language_Code__c = :sourceLanguage');
         }
 
         if (String.isNotBlank(targetLanguage)) {
-            conditionals.add('Target_Language__c = :targetLanguage');
+            conditionals.add('Target_Language__c = :targetLanguage OR Target_Language_Code__c = :targetLanguage');
         }
 
         if (!conditionals.isEmpty()) {
@@ -143,7 +144,8 @@ public with sharing class TranslationController {
                 Source_Language__c,
                 Target_Language__c,
                 Translated_Content__c,
-                Acknowledged__c
+                Acknowledged__c,
+                Record_Id__c
             FROM 
                 Translation__c
             WHERE 
@@ -242,9 +244,12 @@ public with sharing class TranslationController {
         @AuraEnabled
         public Boolean acknowledged { get; set; }
 
+        @AuraEnabled 
+        public String recordId { get; set; }
+
         public TranslationDetailItem(String id, String objectName, String fieldName, String status, String slug,
                                      String jobId, String orderId, String sourceContent, String sourceLanguage,
-                                     String targetLanguage, String translatedContent, Boolean acknowledged) {
+                                     String targetLanguage, String translatedContent, Boolean acknowledged, String recordId) {
             this.id = id;
             this.objectName = objectName;
             this.fieldName = fieldName;
@@ -257,6 +262,7 @@ public with sharing class TranslationController {
             this.targetLanguage = targetLanguage;
             this.translatedContent = translatedContent;
             this.acknowledged = acknowledged;
+            this.recordId = recordId;
         }
     }
 }

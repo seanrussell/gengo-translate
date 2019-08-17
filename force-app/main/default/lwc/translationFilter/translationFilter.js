@@ -17,7 +17,7 @@ export default class TranslationFilter extends LightningElement {
     }
 
     handleSourceLanguageChange(event) {
-        if (event.detail) {
+        if (event.detail !== undefined) {
             fireEvent(this.pageRef, 'translationFilterChange', {
                 sourceLanguage: event.detail
             });
@@ -25,7 +25,7 @@ export default class TranslationFilter extends LightningElement {
     }
 
     handleTargetLanguageChange(event) {
-        if (event.detail) {
+        if (event.detail !== undefined) {
             fireEvent(this.pageRef, 'translationFilterChange', {
                 targetLanguage: event.detail
             });

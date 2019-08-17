@@ -68,7 +68,8 @@ public with sharing class GengoTranslateController {
         submissionResult.status = translationSubmitResponse.opstat;
 
         if (!String.isBlank(translationSubmitResponse.opstat) && translationSubmitResponse.opstat == GengoConstants.OK_STATUS) {
-            submissionResult.translations = createTranslations(data.relatedRecordId, data.objectName, data.fieldName, data.jobs, String.valueOf(translationSubmitResponse.response.order_id));
+            String orderId = String.valueOf(translationSubmitResponse.response.order_id);
+            submissionResult.translations = createTranslations(data.relatedRecordId, data.objectName, data.fieldName, data.jobs, orderId);
         } 
 
         return submissionResult;
@@ -111,6 +112,17 @@ public with sharing class GengoTranslateController {
         return service.getLanguages();
     }
 
+    /**
+	 * Updates a translation for a record
+	 * @param recordId the id of the translation record
+     * @param action the action to perform (approve or reject)
+	 * @return PagedResult 
+	 */
+    @AuraEnabled(cacheable=true)
+    public static String updateTranslation(String recordId, String action) {
+       return service.updateTranslation(recordId, action);
+    }
+
     private static String convertJobsPayload(List<Job> jobs) {
         Map<String, Map<String, Object>> jobsPayload = new Map<String, Map<String, Object>>{
             GengoConstants.JOBS_FIELD => new Map<String, Object>()
@@ -132,7 +144,6 @@ public with sharing class GengoTranslateController {
             
             if (hasCallbackUrl()) {
                 String callbackUrl = getCallbackUrl();
-                System.debug(LoggingLevel.WARN, 'CALLBACK URL --> ' + callbackUrl);
                 jobBody.put(GengoConstants.JOB_CALLBACK_URL, callbackUrl);
             }
 
@@ -161,9 +172,9 @@ public with sharing class GengoTranslateController {
         return service.getJobs(jobIds);
     }
 
-    private static List<Translation> createTranslations(String relatedRecordId, String objectName, String fieldName, List<Job> jobs, String orderId) {
+    private static List<Translation> createTranslations(String relatedRecordId, String objectName, String fieldName, List<Job> jobs, String orderId) { 
         List<Translation__c> translations = new List<Translation__c>();
-           
+        
         for (Job job: jobs) {
             translations.add(new Translation__c(
                 Order_Id__c = orderId,
@@ -193,7 +204,7 @@ public with sharing class GengoTranslateController {
                 translation.Status__c
             ));
         }
-        
+
         return trans;
     }
 

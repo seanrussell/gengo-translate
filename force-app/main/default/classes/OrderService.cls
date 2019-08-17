@@ -15,7 +15,7 @@ public class OrderService {
                 GengoResponse.TranslationOrderResponse tor = (GengoResponse.TranslationOrderResponse)JSON.deserialize(result, GengoResponse.TranslationOrderResponse.class);
             
                 if (tor.opstat == GengoConstants.OK_STATUS) {
-                    GengoResponse.RetrieveResponse  rr = tor.response;
+                    GengoResponse.RetrieveResponse rr = tor.response;
 
                     for (String status: GengoConstants.ORDER_STATUSES) {
                         List<Translation__c> trans = processJobStatus(status, rr.order, jobMap);
