@@ -114,11 +114,11 @@ public with sharing class TranslationController {
         }
 
         if (String.isNotBlank(sourceLanguage)) {
-            conditionals.add('Source_Language__c = :sourceLanguage OR Source_Language_Code__c = :sourceLanguage');
+            conditionals.add('(Source_Language__c = :sourceLanguage OR Source_Language_Code__c = :sourceLanguage)');
         }
 
         if (String.isNotBlank(targetLanguage)) {
-            conditionals.add('Target_Language__c = :targetLanguage OR Target_Language_Code__c = :targetLanguage');
+            conditionals.add('(Target_Language__c = :targetLanguage OR Target_Language_Code__c = :targetLanguage)');
         }
 
         if (!conditionals.isEmpty()) {
@@ -126,7 +126,7 @@ public with sharing class TranslationController {
         }
 
         soql += ' LIMIT :pageSize OFFSET :offset';
-
+        
         return Database.query(soql);
     }
 

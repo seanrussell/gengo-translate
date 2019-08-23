@@ -3,25 +3,34 @@ public class GengoService implements TranslationService {
     private static final Auth AUTH = new Auth();
 
     public class Auth {
-        String apiUrl { get; set; }
-        String apiKey { get; set; }
-        String apiSig { get; set; }
-        String ts { get; set; }
+        private String apiUrl { get; set; }
+        private String apiKey { get; set; }
+        private String apiSig { get; set; }
+        private String ts { get; set; }
+        
+        public List<Translation_Setting__mdt> settings {
+            get {
+                if (settings == null) {
+                    settings = [
+                        SELECT 
+                            Sandbox_Url__c,
+                            Production_Url__c,
+                            Api_Key__c,
+                            Api_Sig__c,
+                            Use_Sandbox__c
+                        FROM 
+                            Translation_Setting__mdt
+                        WHERE
+                            Active__c = true
+                    ];
+                }
+
+                return settings;
+            }
+            set;
+        }
 
         public Auth() {
-            List<Translation_Setting__mdt> settings = [
-                SELECT 
-                    Sandbox_Url__c,
-                    Production_Url__c,
-                    Api_Key__c,
-                    Api_Sig__c,
-                    Use_Sandbox__c
-                FROM 
-                    Translation_Setting__mdt
-                WHERE
-                    Active__c = true
-            ];
-
             if (!settings.isEmpty()) {
                 initialize(settings.get(0));
             }
@@ -75,10 +84,10 @@ public class GengoService implements TranslationService {
                 this.auth.apiKey,
                 this.auth.apiSig
             });
+            
+            String getUrl = String.format(this.auth.apiUrl + JOB_DETAILS, new List<String>{ jobId });
 
-            String apiUrl = String.format(this.auth.apiUrl + JOB_DETAILS + qs, new List<String>{ jobId });
-
-            return send('GET', apiUrl, null, null);
+            return send('GET', getUrl + qs, null, null);
         }
 
         public String getJobsDetails(List<Integer> jobIds) {
@@ -106,7 +115,7 @@ public class GengoService implements TranslationService {
             };
 
             String putUrl = String.format(JOB_DETAILS, new List<String>{ jobId });
-        
+
             return send('PUT', this.auth.apiUrl + putUrl, form, headers);
         }
     }
