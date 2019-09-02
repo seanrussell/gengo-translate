@@ -1,0 +1,23 @@
+{
+  "name": "gengotranslate",
+  "private": true,
+  "version": "1.0.0",
+  "description": "GengoTranslate",
+  "author": "Sean Russell <seand.russell@gmail.com>",
+  "license": "ISC",
+  "scripts": {
+    "test:unit": "lwc-jest",
+    "test:unit:debug": "lwc-jest --debug"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/seanrussell/gengo-translate.git"
+  },
+  "engines": {
+    "node": ">= 10.0.0",
+    "npm": ">= 5.6.0"
+  },
+  "devDependencies": {
+    "@salesforce/lwc-jest": "^0.4.12"
+  }
+}
