@@ -31,5 +31,8 @@ global class GengoCallbackHandler {
                 }
             }
         }
+
+        RestResponse res = RestContext.response;
+        res.responseBody = Blob.valueOf('success');
     }
 }

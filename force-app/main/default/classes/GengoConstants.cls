@@ -3,6 +3,7 @@ public class GengoConstants {
     public static final String JOB_PREFIX = 'job_';
     public static final String STATUS_AVAILABLE = 'available';
     public static final String PUBLIC_SITE = 'Gengo_Public';
+    public static final String EDITION_DEVELOPER = 'Developer Edition';
 
     // Site url formats
     public static final String CALLBACK_SANDBOX = '{0}{1}-{2}.{3}.force.com/services/apexrest/order';

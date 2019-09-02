@@ -2,7 +2,8 @@ public with sharing class GengoTranslateController {
     /*
      * Service that contains API calls to third party service
      */
-    private static GengoService service = new GengoService();
+    @TestVisible 
+    private static TranslationService service = new GengoService();
 
     /**
 	 * Retrieves the fields for an object
@@ -157,21 +158,6 @@ public with sharing class GengoTranslateController {
         return JSON.serialize(jobsPayload);
     }
 
-    private static String retrieveJobsForOrder(String translationOrder) {
-        GengoResponse.TranslationOrderResponse translationOrderResponse = (GengoResponse.TranslationOrderResponse)JSON.deserialize(translationOrder, GengoResponse.TranslationOrderResponse.class);
-
-        List<Integer> jobIds = new List<Integer>();
-
-        if (!String.isBlank(translationOrderResponse.opstat) && translationOrderResponse.opstat == GengoConstants.OK_STATUS) {
-            GengoResponse.RetrieveResponse orderRetrieveResponse = translationOrderResponse.response;
-            GengoResponse.OrderResponse orderResponse = orderRetrieveResponse.order;
-        
-            jobIds = getJobIdsForOrder(orderResponse);
-        }
-
-        return service.getJobs(jobIds);
-    }
-
     private static List<Translation> createTranslations(String relatedRecordId, String objectName, String fieldName, List<Job> jobs, String orderId) { 
         List<Translation__c> translations = new List<Translation__c>();
         
@@ -206,40 +192,6 @@ public with sharing class GengoTranslateController {
         }
 
         return trans;
-    }
-
-    private static List<Integer> getJobIdsForOrder(GengoResponse.OrderResponse orderResponse) {
-        List<Integer> jobIds = new List<Integer>();
-
-        if (orderResponse.jobs_reviewable != null && !orderResponse.jobs_reviewable.isEmpty()) {
-            jobIds.addAll(orderResponse.jobs_reviewable);
-        }
-
-        if (orderResponse.jobs_available != null && !orderResponse.jobs_available.isEmpty()) {
-            jobIds.addAll(orderResponse.jobs_available);
-        }
-
-        if (orderResponse.jobs_pending != null && !orderResponse.jobs_pending.isEmpty()) {
-            jobIds.addAll(orderResponse.jobs_pending);
-        }
-
-        if (orderResponse.jobs_approved != null && !orderResponse.jobs_approved.isEmpty()) {
-            jobIds.addAll(orderResponse.jobs_approved);
-        }
-
-        if (orderResponse.jobs_revising != null && !orderResponse.jobs_revising.isEmpty()) {
-            jobIds.addAll(orderResponse.jobs_revising);
-        }
-
-        if (orderResponse.jobs_cancelled != null && !orderResponse.jobs_cancelled.isEmpty()) {
-            jobIds.addAll(orderResponse.jobs_cancelled);
-        }
-
-        if (orderResponse.jobs_held != null && !orderResponse.jobs_held.isEmpty()) {
-            jobIds.addAll(orderResponse.jobs_held);
-        }
-
-        return jobIds;
     }
 
     private static String retrieveFieldContentToTranslate(String recordId, String objectName, String fieldName) {
@@ -308,7 +260,7 @@ public with sharing class GengoTranslateController {
                 }            
 
                 // SANBOX
-                if (org.IsSandbox && org.OrganizationType != 'Developer Edition') {
+                if (org.IsSandbox && org.OrganizationType != GengoConstants.EDITION_DEVELOPER) {
                     url = String.format(GengoConstants.CALLBACK_SANDBOX, new List<String>{
                         httpStr,
                         UserInfo.getUserName().substringAfterLast('.'),
@@ -318,7 +270,7 @@ public with sharing class GengoTranslateController {
                 }
 
                 // DEVELOPER
-                if (!org.IsSandbox && org.OrganizationType == 'Developer Edition') {
+                if (!org.IsSandbox && org.OrganizationType == GengoConstants.EDITION_DEVELOPER) {
                     url = String.format(GengoConstants.CALLBACK_DEVELOPER, new List<String>{
                         httpStr,
                         subdomain,
@@ -327,7 +279,7 @@ public with sharing class GengoTranslateController {
                 }
 
                 // SCRATCH 
-                if (org.IsSandbox && org.OrganizationType == 'Developer Edition') {
+                if (org.IsSandbox && org.OrganizationType == GengoConstants.EDITION_DEVELOPER) {
                     url = String.format(GengoConstants.CALLBACK_SCRATCH, new List<String>{
                         httpStr,
                         subdomain,
