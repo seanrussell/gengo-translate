@@ -1,9 +1,3 @@
-# SFDX App
 
-## Dev, Build and Test
+[![CircleCI](https://circleci.com/gh/seanrussell/gengo-translate.svg?style=svg)](https://circleci.com/gh/seanrussell/gengo-translate)
 
-## Resources
-
-## Description of Files and Directories
-
-## Issues
