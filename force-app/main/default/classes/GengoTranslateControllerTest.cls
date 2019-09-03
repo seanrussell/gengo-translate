@@ -186,11 +186,11 @@ private class GengoTranslateControllerTest {
         }
 
         public String getOrder(String orderId) {
-            return null;
+            return '{"opstat":"ok"}';
         }
 
         public String getJobs(List<Integer> jobIds) {
-            return null;
+            return '{"opstat":"ok"}';
         }
 
         public String getAccountBalance() {
