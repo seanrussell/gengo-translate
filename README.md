@@ -2,7 +2,7 @@
 
 [![CircleCI](https://circleci.com/gh/seanrussell/gengo-translate.svg?style=svg)](https://circleci.com/gh/seanrussell/gengo-translate)
 
-# Gengo Integration
+## Gengo Integration
 ![Gengo Translate Integration](/assets/gengo-translate.png)
 
 ## Installing Gengo Translate using a Scratch Org
@@ -52,4 +52,7 @@ sfdx force:user:permset:assign -n Translation_Manager
 sfdx force:org:open
 ```
 
-8. In App Launcher, select the **Gengo Translate** app.
+8. Register domain
+9. Create a Site
+10. Add remote site setting
+11. In App Launcher, select the **Gengo Translate** app.
