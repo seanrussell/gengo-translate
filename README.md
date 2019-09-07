@@ -54,5 +54,4 @@ sfdx force:org:open
 
 8. Register domain
 9. Create a Site
-10. Add remote site setting
-11. In App Launcher, select the **Gengo Translate** app.
+10. In App Launcher, select the **Gengo Translate** app.
