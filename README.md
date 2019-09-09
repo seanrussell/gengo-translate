@@ -52,7 +52,7 @@ sfdx force:user:permset:assign -n Translation_Manager
 sfdx force:org:open
 ```
 
-8. Register domain
+8. Register a domain
 - In order to use lightning components, you must register a unique [domain](https://help.salesforce.com/articleView?id=domain_mgmt_add.htm&type=5) for your org.
 
 9. Create a Site
@@ -62,4 +62,4 @@ sfdx force:org:open
 - Finally, activate the site.
 
 10. Modify Record Page layouts and add the gengoTranslate component
-	- For example, modify the Case record page layout to add the gengoTranslate component to the page.
+- For example, modify the Case record page layout to add the gengoTranslate component to the page.
