@@ -54,12 +54,12 @@ sfdx force:org:open
 
 8. Register domain
 - In order to use lightning components, you must register a unique [domain](https://help.salesforce.com/articleView?id=domain_mgmt_add.htm&type=5) for your org.
-- 
+
 9. Create a Site
-- Create a public [site](https://help.salesforce.com/articleView?id=sites_creating_and_editing_sites.htm&type=5)
-- The api name for the site should be “Gengo_Public”
-- Add GengoCallbackHandler apex class to public site access settings
-- Finally, activate the site
+- Create a public [site](https://help.salesforce.com/articleView?id=sites_creating_and_editing_sites.htm&type=5).
+- The api name for the site should be "Gengo_Public".
+- Add GengoCallbackHandler apex class to public site access settings.
+- Finally, activate the site.
 
 10. Modify Record Page layouts and add the gengoTranslate component
-	- For example, modify the Case record page layout to add the gengoTranslate component to the page
+	- For example, modify the Case record page layout to add the gengoTranslate component to the page.
